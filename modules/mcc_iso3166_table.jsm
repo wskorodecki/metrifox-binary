@@ -1,0 +1,1 @@
+/home/wojtek/Repositories/firefox-45.0.2/dom/phonenumberutils/mcc_iso3166_table.jsm

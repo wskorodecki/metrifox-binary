@@ -1,0 +1,1 @@
+/home/wojtek/Repositories/firefox-45.0.2/devtools/client/netmonitor/har/har-collector.js

@@ -1,0 +1,1 @@
+/home/wojtek/Repositories/firefox-45.0.2/devtools/client/debugger/views/variable-bubble-view.js

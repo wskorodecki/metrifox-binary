@@ -1,0 +1,8 @@
+interfaces browser-feeds.xpt
+interfaces browsercompsbase.xpt
+interfaces devtools_security.xpt
+interfaces fuel.xpt
+interfaces jsinspector.xpt
+interfaces migration.xpt
+interfaces sessionstore.xpt
+interfaces shellservice.xpt

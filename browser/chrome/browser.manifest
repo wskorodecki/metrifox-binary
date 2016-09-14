@@ -1,0 +1,11 @@
+content branding browser/content/branding/ contentaccessible=yes
+content browser browser/content/browser/ contentaccessible=yes
+overlay chrome://browser/content/browser.xul chrome://browser/content/report-phishing-overlay.xul
+overlay chrome://browser/content/places/places.xul chrome://browser/content/places/downloadsViewOverlay.xul
+overlay chrome://global/content/viewPartialSource.xul chrome://browser/content/viewSourceOverlay.xul
+overlay chrome://global/content/viewSource.xul chrome://browser/content/viewSourceOverlay.xul
+override chrome://global/content/license.html chrome://browser/content/license.html
+override chrome://global/content/netError.xhtml chrome://browser/content/aboutNetError.xhtml
+override chrome://global/skin/icons/warning-16.png moz-icon://stock/gtk-dialog-warning?size=menu
+skin browser classic/1.0 browser/skin/classic/browser/
+skin communicator classic/1.0 browser/skin/classic/communicator/

@@ -1,0 +1,1 @@
+/home/wojtek/Repositories/firefox-45.0.2/devtools/client/projecteditor/lib/helpers/l10n.js

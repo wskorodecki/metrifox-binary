@@ -1,0 +1,1 @@
+/home/wojtek/Repositories/firefox-45.0.2/browser/extensions/shumway/chrome/content.js

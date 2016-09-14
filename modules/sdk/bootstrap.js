@@ -1,0 +1,1 @@
+/home/wojtek/Repositories/firefox-45.0.2/addon-sdk/source/app-extension/bootstrap.js

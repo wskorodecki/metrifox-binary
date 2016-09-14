@@ -1,0 +1,1106 @@
+<?xml version="1.0"?>
+
+
+<?xml-stylesheet href="chrome://browser/content/browser.css" type="text/css"?>
+<?xml-stylesheet href="chrome://browser/skin/" type="text/css"?>
+<?xul-overlay href="chrome://browser/content/baseMenuOverlay.xul"?>
+<?xul-overlay href="chrome://global/content/editMenuOverlay.xul"?>
+<?xul-overlay href="chrome://browser/content/places/placesOverlay.xul"?>
+
+<!DOCTYPE window [
+<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd" >
+%brandDTD;
+<!ENTITY % browserDTD SYSTEM "chrome://browser/locale/browser.dtd" >
+%browserDTD;
+<!ENTITY % baseMenuDTD SYSTEM "chrome://browser/locale/baseMenuOverlay.dtd" >
+%baseMenuDTD;
+<!ENTITY % charsetDTD SYSTEM "chrome://global/locale/charsetMenu.dtd" >
+%charsetDTD;
+<!ENTITY % textcontextDTD SYSTEM "chrome://global/locale/textcontext.dtd" >
+%textcontextDTD;
+<!ENTITY % customizeToolbarDTD SYSTEM "chrome://global/locale/customizeToolbar.dtd">
+  %customizeToolbarDTD;
+<!ENTITY % placesDTD SYSTEM "chrome://browser/locale/places/places.dtd">
+%placesDTD;
+<!ENTITY % safebrowsingDTD SYSTEM "chrome://browser/locale/safebrowsing/phishing-afterload-warning-message.dtd">
+%safebrowsingDTD;
+<!ENTITY % aboutHomeDTD SYSTEM "chrome://browser/locale/aboutHome.dtd">
+%aboutHomeDTD;
+<!ENTITY % syncBrandDTD SYSTEM "chrome://browser/locale/syncBrand.dtd">
+%syncBrandDTD;
+]>
+
+
+<window id="chat-window"
+        windowtype="Social:Chat"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="&mainWindow.title;"
+        onload="gChatWindow.onLoad();"
+        onunload="gChatWindow.onUnload();"
+        macanimationtype="document"
+        fullscreenbutton="true"
+        width="400px"
+        height="420px"
+        persist="screenX screenY width height sizemode">
+
+  <script type="application/javascript" src="chrome://global/content/globalOverlay.js"/>
+  <script type="application/javascript" src="chrome://global/content/contentAreaUtils.js"/>
+  <script type="application/javascript" src="chrome://browser/content/nsContextMenu.js"/>
+
+
+<script type="application/javascript" src="chrome://global/content/printUtils.js"/>
+<script type="application/javascript" src="chrome://global/content/viewZoomOverlay.js"/>
+<script type="application/javascript" src="chrome://browser/content/places/browserPlacesViews.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser.js"/>
+<script type="application/javascript" src="chrome://browser/content/downloads/downloads.js"/>
+<script type="application/javascript" src="chrome://browser/content/downloads/indicator.js"/>
+<script type="application/javascript" src="chrome://browser/content/customizableui/panelUI.js"/>
+<script type="application/javascript" src="chrome://global/content/inlineSpellCheckUI.js"/>
+<script type="application/javascript" src="chrome://global/content/viewSourceUtils.js"/>
+
+<script type="application/javascript" src="chrome://browser/content/browser-addons.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-ctrlTab.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-customization.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-devedition.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-eme.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-feeds.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-fullScreen.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-fullZoom.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-gestureSupport.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-places.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-plugins.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-safebrowsing.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-sidebar.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-social.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-syncui.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-tabsintitlebar.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-thumbnails.js"/>
+<script type="application/javascript" src="chrome://browser/content/browser-trackingprotection.js"/>
+
+<script type="application/javascript" src="chrome://browser/content/browser-data-submission-info-bar.js"/>
+
+<script type="application/javascript" src="chrome://browser/content/browser-fxaccounts.js"/>
+
+<script type="application/javascript">
+
+var gChatWindow = {
+  // cargo-culted from browser.js for nonBrowserStartup, but we're slightly
+  // different what what we need to leave enabled
+  onLoad: function() {
+    // Disable inappropriate commands / submenus
+    var disabledItems = ['Browser:SavePage', 'Browser:OpenFile',
+                         'Browser:SendLink', 'cmd_pageSetup', 'cmd_print',
+                         'cmd_find', 'cmd_findAgain', 'cmd_findPrevious',
+                         'cmd_fullZoomReduce', 'cmd_fullZoomEnlarge', 'cmd_fullZoomReset',
+                         'Browser:OpenLocation', 'Tools:Search',
+                         'Tools:Sanitize', 'Tools:DevToolbox',
+                         'key_selectTab1', 'key_selectTab2', 'key_selectTab3',
+                         'key_selectTab4', 'key_selectTab5', 'key_selectTab6',
+                         'key_selectTab7', 'key_selectTab8', 'key_selectLastTab',
+                         'viewHistorySidebar', 'viewBookmarksSidebar',
+                         'Browser:AddBookmarkAs', 'Browser:BookmarkAllTabs'];
+
+    for (let disabledItem of disabledItems) {
+      document.getElementById(disabledItem).setAttribute("disabled", "true");
+    }
+
+    window.QueryInterface(Ci.nsIDOMChromeWindow).browserDOMWindow =
+      new chatBrowserAccess();
+
+    // initialise the offline listener
+    BrowserOffline.init();
+  },
+
+  onUnload: function() {
+    BrowserOffline.uninit();
+  }
+}
+
+// define a popupnotifications handler for this window.  we don't use
+// an iconbox here, and only support the browser frame for chat.
+XPCOMUtils.defineLazyGetter(this, "PopupNotifications", function () {
+  let tmp = {};
+  Cu.import("resource://gre/modules/PopupNotifications.jsm", tmp);
+  try {
+    return new tmp.PopupNotifications(document.getElementById("chatter").content,
+                                      document.getElementById("notification-popup"),
+                                      null);
+  } catch (ex) {
+    console.error(ex);
+    return null;
+  }
+});
+
+XPCOMUtils.defineLazyModuleGetter(this, "RecentWindow",
+                                  "resource:///modules/RecentWindow.jsm");
+
+function chatBrowserAccess() { }
+
+chatBrowserAccess.prototype = {
+  QueryInterface: XPCOMUtils.generateQI([Ci.nsIBrowserDOMWindow, Ci.nsISupports]),
+
+  _openURIInNewTab: function(aURI, aWhere) {
+    if (aWhere != Ci.nsIBrowserDOMWindow.OPEN_NEWTAB)
+      return null;
+
+    let win = RecentWindow.getMostRecentBrowserWindow();
+    if (!win) {
+      // We couldn't find a suitable window, a new one needs to be opened.
+      return null;
+    }
+
+    let loadInBackground =
+      Services.prefs.getBoolPref("browser.tabs.loadDivertedInBackground");
+    let tab = win.gBrowser.loadOneTab(aURI ? aURI.spec : "about:blank",
+                                      {inBackground: loadInBackground});
+    let browser = win.gBrowser.getBrowserForTab(tab);
+    win.focus();
+
+    return browser;
+  },
+
+  openURI: function (aURI, aOpener, aWhere, aContext) {
+    let browser = this._openURIInNewTab(aURI, aWhere);
+    return browser ? browser.contentWindow : null;
+  },
+
+  openURIInFrame: function browser_openURIInFrame(aURI, aParams, aWhere, aContext) {
+    let browser = this._openURIInNewTab(aURI, aWhere);
+    return browser ? browser.QueryInterface(Ci.nsIFrameLoaderOwner) : null;
+  },
+
+  isTabContentWindow: function (aWindow) {
+    return this.contentWindow == aWindow;
+  },
+
+  canClose() {
+    let {BrowserUtils} = Cu.import("resource://gre/modules/BrowserUtils.jsm", {});
+    return BrowserUtils.canCloseWindow(window);
+  },
+};
+
+</script>
+
+
+
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="bundle_brand" src="chrome://branding/locale/brand.properties"/>
+    <stringbundle id="bundle_shell" src="chrome://browser/locale/shellservice.properties"/>
+    <stringbundle id="bundle_preferences" src="chrome://browser/locale/preferences/preferences.properties"/>
+  </stringbundleset>
+
+  <commandset id="mainCommandSet">
+    <command id="cmd_newNavigator" oncommand="OpenBrowserWindow()" reserved="true"/>
+    <command id="cmd_handleBackspace" oncommand="BrowserHandleBackspace();" />
+    <command id="cmd_handleShiftBackspace" oncommand="BrowserHandleShiftBackspace();" />
+
+    <command id="cmd_newNavigatorTab" oncommand="BrowserOpenNewTabOrWindow(event);" reserved="true"/>
+    <command id="Browser:OpenFile"  oncommand="BrowserOpenFileWindow();"/>
+    <command id="Browser:SavePage" oncommand="saveBrowser(gBrowser.selectedBrowser);"/>
+
+    <command id="Browser:SendLink"
+             oncommand="MailIntegration.sendLinkForBrowser(gBrowser.selectedBrowser);"/>
+
+    <command id="cmd_pageSetup" oncommand="PrintUtils.showPageSetup();"/>
+    <command id="cmd_print" oncommand="PrintUtils.printWindow(window.gBrowser.selectedBrowser.outerWindowID, window.gBrowser.selectedBrowser);"/>
+    <command id="cmd_printPreview" oncommand="PrintUtils.printPreview(PrintPreviewListener);"/>
+    <command id="cmd_close" oncommand="BrowserCloseTabOrWindow()" reserved="true"/>
+    <command id="cmd_closeWindow" oncommand="BrowserTryToCloseWindow()" reserved="true"/>
+    <command id="cmd_toggleMute" oncommand="gBrowser.selectedTab.toggleMuteAudio()"/>
+    <command id="cmd_CustomizeToolbars" oncommand="BrowserCustomizeToolbar()"/>
+    <command id="cmd_quitApplication" oncommand="goQuitApplication()" reserved="true"/>
+
+
+    <commandset id="editMenuCommands"/>
+
+    <command id="View:PageSource" oncommand="BrowserViewSource(window.gBrowser.selectedBrowser);" observes="canViewSource"/>
+    <command id="View:PageInfo" oncommand="BrowserPageInfo();"/>
+    <command id="View:FullScreen" oncommand="BrowserFullScreen();"/>
+    <command id="View:ReaderView" oncommand="ReaderParent.toggleReaderMode(event);"/>
+    <command id="cmd_find"
+             oncommand="gFindBar.onFindCommand();"
+             observes="isImage"/>
+    <command id="cmd_findAgain"
+             oncommand="gFindBar.onFindAgainCommand(false);"
+             observes="isImage"/>
+    <command id="cmd_findPrevious"
+             oncommand="gFindBar.onFindAgainCommand(true);"
+             observes="isImage"/>
+    <!-- work-around bug 392512 -->
+    <command id="Browser:AddBookmarkAs"
+             oncommand="PlacesCommandHook.bookmarkCurrentPage(true, PlacesUtils.bookmarksMenuFolderId);"/>
+    <!-- The command disabled state must be manually updated through
+         PlacesCommandHook.updateBookmarkAllTabsCommand() -->
+    <command id="Browser:BookmarkAllTabs"
+             oncommand="PlacesCommandHook.bookmarkCurrentPages();"/>
+    <command id="Browser:Home"    oncommand="BrowserHome();"/>
+    <command id="Browser:Back"    oncommand="BrowserBack();" disabled="true"/>
+    <command id="Browser:BackOrBackDuplicate" oncommand="BrowserBack(event);" disabled="true">
+      <observes element="Browser:Back" attribute="disabled"/>
+    </command>
+    <command id="Browser:Forward" oncommand="BrowserForward();" disabled="true"/>
+    <command id="Browser:ForwardOrForwardDuplicate" oncommand="BrowserForward(event);" disabled="true">
+      <observes element="Browser:Forward" attribute="disabled"/>
+    </command>
+    <command id="Browser:Stop"    oncommand="BrowserStop();" disabled="true"/>
+    <command id="Browser:Reload"  oncommand="if (event.shiftKey) BrowserReloadSkipCache(); else BrowserReload()" disabled="true"/>
+    <command id="Browser:ReloadOrDuplicate" oncommand="BrowserReloadOrDuplicate(event)" disabled="true">
+      <observes element="Browser:Reload" attribute="disabled"/>
+    </command>
+    <command id="Browser:ReloadSkipCache" oncommand="BrowserReloadSkipCache()" disabled="true">
+      <observes element="Browser:Reload" attribute="disabled"/>
+    </command>
+    <command id="Browser:NextTab" oncommand="gBrowser.tabContainer.advanceSelectedTab(1, true);" reserved="true"/>
+    <command id="Browser:PrevTab" oncommand="gBrowser.tabContainer.advanceSelectedTab(-1, true);" reserved="true"/>
+    <command id="Browser:ShowAllTabs" oncommand="allTabs.open();"/>
+    <command id="cmd_fullZoomReduce"  oncommand="FullZoom.reduce()"/>
+    <command id="cmd_fullZoomEnlarge" oncommand="FullZoom.enlarge()"/>
+    <command id="cmd_fullZoomReset"   oncommand="FullZoom.reset()"/>
+    <command id="cmd_fullZoomToggle"  oncommand="ZoomManager.toggleZoom();"/>
+    <command id="cmd_gestureRotateLeft" oncommand="gGestureSupport.rotate(event.sourceEvent)"/>
+    <command id="cmd_gestureRotateRight" oncommand="gGestureSupport.rotate(event.sourceEvent)"/>
+    <command id="cmd_gestureRotateEnd" oncommand="gGestureSupport.rotateEnd()"/>
+    <command id="Browser:OpenLocation" oncommand="openLocation();"/>
+    <command id="Browser:RestoreLastSession" oncommand="restoreLastSession();" disabled="true"/>
+    <command id="Browser:NewUserContextTab" oncommand="openNewUserContextTab(event.sourceEvent);" reserved="true"/>
+
+    <command id="Tools:Search" oncommand="BrowserSearch.webSearch();"/>
+    <command id="Tools:Downloads" oncommand="BrowserDownloadsUI();"/>
+    <command id="Tools:DevToolbox" oncommand="gDevToolsBrowser.toggleToolboxCommand(gBrowser);"/>
+    <command id="Tools:DevToolbar" oncommand="DeveloperToolbar.toggle();" disabled="true" hidden="true"/>
+    <command id="Tools:DevToolbarFocus" oncommand="DeveloperToolbar.focusToggle();" disabled="true"/>
+    <command id="Tools:WebIDE" oncommand="gDevToolsBrowser.openWebIDE();" disabled="true" hidden="true"/>
+    <command id="Tools:BrowserToolbox" oncommand="BrowserToolboxProcess.init();" disabled="true" hidden="true"/>
+    <command id="Tools:BrowserContentToolbox" oncommand="gDevToolsBrowser.openContentProcessToolbox();" disabled="true" hidden="true"/>
+    <command id="Tools:BrowserConsole" oncommand="HUDService.openBrowserConsoleOrFocus();"/>
+    <command id="Tools:Scratchpad" oncommand="Scratchpad.openScratchpad();"/>
+    <command id="Tools:ResponsiveUI" oncommand="ResponsiveUI.toggle();"/>
+    <command id="Tools:Eyedropper" oncommand="openEyedropper();"/>
+    <command id="Tools:Addons" oncommand="BrowserOpenAddonsMgr();"/>
+    <command id="Tools:ErrorConsole" oncommand="toJavaScriptConsole()" disabled="true" hidden="true"/>
+    <command id="Tools:DevToolsConnect" oncommand="gDevToolsBrowser.openConnectScreen(gBrowser)" disabled="true" hidden="true"/>
+    <command id="Tools:Sanitize"
+     oncommand="Cc['@mozilla.org/browser/browserglue;1'].getService(Ci.nsIBrowserGlue).sanitize(window);"/>
+    <command id="Tools:PrivateBrowsing"
+      oncommand="OpenBrowserWindow({private: true});" reserved="true"/>
+    <command id="History:UndoCloseTab" oncommand="undoCloseTab();"/>
+    <command id="History:UndoCloseWindow" oncommand="undoCloseWindow();"/>
+    <command id="Social:SharePage" oncommand="SocialShare.sharePage();"/>
+    <command id="Social:ToggleSidebar" oncommand="SocialSidebar.toggleSidebar();" hidden="true"/>
+    <command id="Social:ToggleNotifications" oncommand="Social.toggleNotifications();" hidden="true"/>
+    <command id="Social:Addons" oncommand="BrowserOpenAddonsMgr('addons://list/service');"/>
+    <command id="Chat:Focus" oncommand="Cu.import('resource:///modules/Chat.jsm', {}).Chat.focus(window);"/>
+  </commandset>
+
+  <commandset id="placesCommands">
+    <command id="Browser:ShowAllBookmarks"
+             oncommand="PlacesCommandHook.showPlacesOrganizer('AllBookmarks');"/>
+    <command id="Browser:ShowAllHistory"
+             oncommand="PlacesCommandHook.showPlacesOrganizer('History');"/>
+  </commandset>
+
+  <broadcasterset id="mainBroadcasterSet">
+    <broadcaster id="Social:PageShareOrMark" disabled="true"/>
+    <broadcaster id="viewBookmarksSidebar" autoCheck="false" label="&bookmarksButton.label;"
+                 type="checkbox" group="sidebar" sidebarurl="chrome://browser/content/bookmarks/bookmarksPanel.xul"
+                 oncommand="SidebarUI.toggle('viewBookmarksSidebar');"/>
+
+    <!-- for both places and non-places, the sidebar lives at
+         chrome://browser/content/history/history-panel.xul so there are no
+         problems when switching between versions -->
+    <broadcaster id="viewHistorySidebar" autoCheck="false" sidebartitle="&historyButton.label;"
+                 type="checkbox" group="sidebar"
+                 sidebarurl="chrome://browser/content/history/history-panel.xul"
+                 oncommand="SidebarUI.toggle('viewHistorySidebar');"/>
+
+    <broadcaster id="viewWebPanelsSidebar" autoCheck="false"
+                 type="checkbox" group="sidebar" sidebarurl="chrome://browser/content/web-panels.xul"
+                 oncommand="SidebarUI.toggle('viewWebPanelsSidebar');"/>
+
+    <broadcaster id="bookmarkThisPageBroadcaster"
+                 label="&bookmarkThisPageCmd.label;"
+                 bookmarklabel="&bookmarkThisPageCmd.label;"
+                 editlabel="&editThisBookmarkCmd.label;"/>
+
+    <!-- popup blocking menu items -->
+    <broadcaster id="blockedPopupAllowSite"
+                 accesskey="&allowPopups.accesskey;"
+                 oncommand="gPopupBlockerObserver.toggleAllowPopupsForSite(event);"/>
+    <broadcaster id="blockedPopupEditSettings"
+                 label="&editPopupSettingsUnix.label;"
+                 accesskey="&editPopupSettings.accesskey;"
+                 oncommand="gPopupBlockerObserver.editPopupSettings();"/>
+    <broadcaster id="blockedPopupDontShowMessage"
+                 accesskey="&dontShowMessage.accesskey;"
+                 type="checkbox"
+                 oncommand="gPopupBlockerObserver.dontShowMessage();"/>
+    <broadcaster id="blockedPopupsSeparator"/>
+    <broadcaster id="isImage"/>
+    <broadcaster id="canViewSource"/>
+    <broadcaster id="isFrameImage"/>
+    <broadcaster id="singleFeedMenuitemState" disabled="true"/>
+    <broadcaster id="multipleFeedsMenuState" hidden="true"/>
+
+    <!-- Sync broadcasters -->
+    <!-- A broadcaster of a number of attributes suitable for "sync now" UI -
+        A 'syncstatus' attribute is set while actively syncing, and the label
+        attribute which changes from "sync now" to "syncing" etc. -->
+    <broadcaster id="sync-status"/>
+    <!-- broadcasters of the "hidden" attribute to reflect setup state for
+         menus -->
+    <broadcaster id="sync-setup-state"/>
+    <broadcaster id="sync-syncnow-state" hidden="true"/>
+    <broadcaster id="sync-reauth-state" hidden="true"/>
+    <broadcaster id="workOfflineMenuitemState"/>
+    <broadcaster id="socialSidebarBroadcaster" hidden="true"/>
+
+    <!-- DevTools broadcasters -->
+    <broadcaster id="devtoolsMenuBroadcaster_DevToolbox"
+                 label="&devToolboxMenuItem.label;"
+                 type="checkbox" autocheck="false"
+                 command="Tools:DevToolbox"
+                 key="key_devToolboxMenuItem"/>
+    <broadcaster id="devtoolsMenuBroadcaster_DevToolbar"
+                 label="&devToolbarMenu.label;"
+                 type="checkbox" autocheck="false"
+                 command="Tools:DevToolbar"
+                 key="key_devToolbar"/>
+    <broadcaster id="devtoolsMenuBroadcaster_webide"
+                 label="&webide.label;"
+                 command="Tools:WebIDE"
+                 key="key_webide"/>
+    <broadcaster id="devtoolsMenuBroadcaster_BrowserToolbox"
+                 label="&browserToolboxMenu.label;"
+                 key="key_browserToolbox"
+                 command="Tools:BrowserToolbox"/>
+    <broadcaster id="devtoolsMenuBroadcaster_BrowserContentToolbox"
+                 label="&browserContentToolboxMenu.label;"
+                 command="Tools:BrowserContentToolbox"/>
+    <broadcaster id="devtoolsMenuBroadcaster_BrowserConsole"
+                 label="&browserConsoleCmd.label;"
+                 key="key_browserConsole"
+                 command="Tools:BrowserConsole"/>
+    <broadcaster id="devtoolsMenuBroadcaster_Scratchpad"
+                 label="&scratchpad.label;"
+                 command="Tools:Scratchpad"
+                 key="key_scratchpad"/>
+    <broadcaster id="devtoolsMenuBroadcaster_ResponsiveUI"
+                 label="&responsiveDesignTool.label;"
+                 type="checkbox" autocheck="false"
+                 command="Tools:ResponsiveUI"
+                 key="key_responsiveUI"/>
+    <broadcaster id="devtoolsMenuBroadcaster_Eyedropper"
+                 label="&eyedropper.label;"
+                 type="checkbox" autocheck="false"
+                 command="Tools:Eyedropper"/>
+    <broadcaster id="devtoolsMenuBroadcaster_PageSource"
+                 label="&pageSourceCmd.label;"
+                 key="key_viewSource"
+                 command="View:PageSource">
+      <observes element="canViewSource" attribute="disabled"/>
+    </broadcaster>
+    <broadcaster id="devtoolsMenuBroadcaster_ErrorConsole"
+                 label="&errorConsoleCmd.label;"
+                 command="Tools:ErrorConsole"/>
+    <broadcaster id="devtoolsMenuBroadcaster_GetMoreTools"
+                 label="&getMoreDevtoolsCmd.label;"
+                 oncommand="openUILinkIn('https://addons.mozilla.org/firefox/collections/mozilla/webdeveloper/', 'tab');"/>
+    <broadcaster id="devtoolsMenuBroadcaster_connect"
+                 label="&devtoolsConnect.label;"
+                 command="Tools:DevToolsConnect"/>
+  </broadcasterset>
+
+  <keyset id="mainKeyset">
+    <key id="key_newNavigator"
+         key="&newNavigatorCmd.key;"
+         command="cmd_newNavigator"
+         modifiers="accel"/>
+    <key id="key_newNavigatorTab" key="&tabCmd.commandkey;" modifiers="accel" command="cmd_newNavigatorTab"/>
+    <key id="focusURLBar" key="&openCmd.commandkey;" command="Browser:OpenLocation"
+         modifiers="accel"/>
+    <key id="focusURLBar2" key="&urlbar.accesskey;" command="Browser:OpenLocation"
+         modifiers="alt"/>
+
+    <key id="key_search" key="&searchFocus.commandkey;" command="Tools:Search" modifiers="accel"/>
+    <key id="key_search2" key="&searchFocusUnix.commandkey;" command="Tools:Search" modifiers="accel"/>
+    <key id="key_openDownloads" key="&downloadsUnix.commandkey;" command="Tools:Downloads" modifiers="accel,shift"/>
+    <key id="key_openAddons" key="&addons.commandkey;" command="Tools:Addons" modifiers="accel,shift"/>
+    <key id="key_devToolboxMenuItemF12" keycode="&devToolsCmd.keycode;" keytext="&devToolsCmd.keytext;" command="Tools:DevToolbox"/>
+    <key id="key_browserConsole" key="&browserConsoleCmd.commandkey;" command="Tools:BrowserConsole" modifiers="accel,shift"/>
+    <key id="key_browserToolbox" key="&browserToolboxCmd.commandkey;" command="Tools:BrowserToolbox" modifiers="accel,alt,shift"/>
+    <key id="key_devToolbar" keycode="&devToolbar.keycode;" modifiers="shift"
+         keytext="&devToolbar.keytext;" command="Tools:DevToolbarFocus"/>
+    <key id="key_responsiveUI" key="&responsiveDesignTool.commandkey;" command="Tools:ResponsiveUI"
+        modifiers="accel,shift"
+    />
+    <key id="key_webide" keycode="&webide.keycode;" command="Tools:WebIDE"
+         modifiers="shift" keytext="&webide.keytext;"/>
+    <key id="key_devToolboxMenuItem" keytext="&devToolboxMenuItem.keytext;"
+         command="Tools:DevToolbox" key="&devToolboxMenuItem.keytext;"
+        modifiers="accel,shift"
+    />
+
+    <key id="key_scratchpad" keycode="&scratchpad.keycode;" modifiers="shift"
+         keytext="&scratchpad.keytext;" command="Tools:Scratchpad"/>
+    <key id="openFileKb" key="&openFileCmd.commandkey;" command="Browser:OpenFile"  modifiers="accel"/>
+    <key id="key_savePage" key="&savePageCmd.commandkey;" command="Browser:SavePage" modifiers="accel"/>
+    <key id="printKb" key="&printCmd.commandkey;" command="cmd_print"  modifiers="accel"/>
+    <key id="key_close" key="&closeCmd.key;" command="cmd_close" modifiers="accel"/>
+    <key id="key_closeWindow" key="&closeCmd.key;" command="cmd_closeWindow" modifiers="accel,shift"/>
+    <key id="key_toggleMute" key="&toggleMuteCmd.key;" command="cmd_toggleMute" modifiers="control"/>
+    <key id="key_undo"
+         key="&undoCmd.key;"
+         modifiers="accel"/>
+    <key id="key_redo" key="&undoCmd.key;" modifiers="accel,shift"/>
+    <key id="key_cut"
+         key="&cutCmd.key;"
+         modifiers="accel"/>
+    <key id="key_copy"
+         key="&copyCmd.key;"
+         modifiers="accel"/>
+    <key id="key_paste"
+         key="&pasteCmd.key;"
+         modifiers="accel"/>
+    <key id="key_delete" keycode="VK_DELETE" command="cmd_delete"/>
+    <key id="key_selectAll" key="&selectAllCmd.key;" modifiers="accel"/>
+
+    <key keycode="VK_BACK" command="cmd_handleBackspace"/>
+    <key keycode="VK_BACK" command="cmd_handleShiftBackspace" modifiers="shift"/>
+    <key id="goBackKb"  keycode="VK_LEFT" command="Browser:Back" modifiers="alt"/>
+    <key id="goForwardKb"  keycode="VK_RIGHT" command="Browser:Forward" modifiers="alt"/>
+    <key id="goBackKb2" key="&goBackCmd.commandKey;" command="Browser:Back" modifiers="accel"/>
+    <key id="goForwardKb2" key="&goForwardCmd.commandKey;" command="Browser:Forward" modifiers="accel"/>
+    <key id="goHome" keycode="VK_HOME" command="Browser:Home" modifiers="alt"/>
+    <key keycode="VK_F5" command="Browser:Reload"/>
+    <key id="showAllHistoryKb" key="&showAllHistoryCmd.commandkey;" command="Browser:ShowAllHistory" modifiers="accel,shift"/>
+    <key keycode="VK_F5" command="Browser:ReloadSkipCache" modifiers="accel"/>
+    <key id="key_fullScreen" keycode="VK_F11" command="View:FullScreen"/>
+    <key key="&reloadCmd.commandkey;" command="Browser:Reload" modifiers="accel" id="key_reload"/>
+    <key key="&reloadCmd.commandkey;" command="Browser:ReloadSkipCache" modifiers="accel,shift"/>
+    <key id="key_viewSource" key="&pageSourceCmd.commandkey;" command="View:PageSource" modifiers="accel"/>
+    <key id="key_viewInfo"   key="&pageInfoCmd.commandkey;"   command="View:PageInfo"   modifiers="accel"/>
+    <key id="key_find" key="&findOnCmd.commandkey;" command="cmd_find" modifiers="accel"/>
+    <key id="key_findAgain" key="&findAgainCmd.commandkey;" command="cmd_findAgain" modifiers="accel"/>
+    <key id="key_findPrevious" key="&findAgainCmd.commandkey;" command="cmd_findPrevious" modifiers="accel,shift"/>
+    <key keycode="&findAgainCmd.commandkey2;" command="cmd_findAgain"/>
+    <key keycode="&findAgainCmd.commandkey2;"  command="cmd_findPrevious" modifiers="shift"/>
+
+    <key id="addBookmarkAsKb" key="&bookmarkThisPageCmd.commandkey;" command="Browser:AddBookmarkAs" modifiers="accel"/>
+    <key id="manBookmarkKb" key="&bookmarksGtkCmd.commandkey;" command="Browser:ShowAllBookmarks" modifiers="accel,shift"/>
+    <key id="viewBookmarksSidebarKb" key="&bookmarksCmd.commandkey;" command="viewBookmarksSidebar" modifiers="accel"/>
+
+    <!--<key id="markPage" key="&markPageCmd.commandkey;" command="Social:TogglePageMark" modifiers="accel,shift"/>-->
+    <key id="focusChatBar" key="&social.chatBar.commandkey;" command="Chat:Focus"
+         modifiers="accel,alt"
+    />
+
+    <key id="key_stop" keycode="VK_ESCAPE" command="Browser:Stop"/>
+
+
+    <key id="key_gotoHistory"
+         key="&historySidebarCmd.commandKey;"
+         modifiers="accel"
+         command="viewHistorySidebar"/>
+
+    <key id="key_fullZoomReduce"  key="&fullZoomReduceCmd.commandkey;"   command="cmd_fullZoomReduce"  modifiers="accel"/>
+    <key                          key="&fullZoomReduceCmd.commandkey2;"  command="cmd_fullZoomReduce"  modifiers="accel"/>
+    <key id="key_fullZoomEnlarge" key="&fullZoomEnlargeCmd.commandkey;"  command="cmd_fullZoomEnlarge" modifiers="accel"/>
+    <key                          key="&fullZoomEnlargeCmd.commandkey2;" command="cmd_fullZoomEnlarge" modifiers="accel"/>
+    <key                          key="&fullZoomEnlargeCmd.commandkey3;" command="cmd_fullZoomEnlarge" modifiers="accel"/>
+    <key id="key_fullZoomReset"   key="&fullZoomResetCmd.commandkey;"    command="cmd_fullZoomReset"   modifiers="accel"/>
+    <key                          key="&fullZoomResetCmd.commandkey2;"   command="cmd_fullZoomReset"   modifiers="accel"/>
+
+    <key id="key_showAllTabs" command="Browser:ShowAllTabs" keycode="VK_TAB" modifiers="control,shift"/>
+
+    <key id="key_switchTextDirection" key="&bidiSwitchTextDirectionItem.commandkey;" command="cmd_switchTextDirection" modifiers="accel,shift" />
+
+    <key id="key_privatebrowsing" command="Tools:PrivateBrowsing" key="&privateBrowsingCmd.commandkey;" modifiers="accel,shift"/>
+    <key id="key_sanitize" command="Tools:Sanitize" keycode="VK_DELETE" modifiers="accel,shift"/>
+    <key id="key_quitApplication" key="&quitApplicationCmdUnix.key;" command="cmd_quitApplication" modifiers="accel"/>
+
+    <key id="key_undoCloseWindow" command="History:UndoCloseWindow" key="&newNavigatorCmd.key;" modifiers="accel,shift"/>
+
+
+   <key id="key_selectTab1" oncommand="gBrowser.selectTabAtIndex(0, event);" key="1" modifiers="alt"/>
+   <key id="key_selectTab2" oncommand="gBrowser.selectTabAtIndex(1, event);" key="2" modifiers="alt"/>
+   <key id="key_selectTab3" oncommand="gBrowser.selectTabAtIndex(2, event);" key="3" modifiers="alt"/>
+   <key id="key_selectTab4" oncommand="gBrowser.selectTabAtIndex(3, event);" key="4" modifiers="alt"/>
+   <key id="key_selectTab5" oncommand="gBrowser.selectTabAtIndex(4, event);" key="5" modifiers="alt"/>
+   <key id="key_selectTab6" oncommand="gBrowser.selectTabAtIndex(5, event);" key="6" modifiers="alt"/>
+   <key id="key_selectTab7" oncommand="gBrowser.selectTabAtIndex(6, event);" key="7" modifiers="alt"/>
+   <key id="key_selectTab8" oncommand="gBrowser.selectTabAtIndex(7, event);" key="8" modifiers="alt"/>
+   <key id="key_selectLastTab" oncommand="gBrowser.selectTabAtIndex(-1, event);" key="9" modifiers="alt"/>
+
+  </keyset>
+
+  <keyset id="baseMenuKeyset" />
+
+
+  <popupset id="mainPopupSet">
+    <tooltip id="aHTMLTooltip" page="true"/>
+    <menupopup id="contentAreaContextMenu" pagemenu="start"
+               onpopupshowing="if (event.target != this)
+                                 return true;
+                               gContextMenu = new nsContextMenu(this, event.shiftKey);
+                               if (gContextMenu.shouldDisplay)
+                                 document.popupNode = this.triggerNode;
+                               return gContextMenu.shouldDisplay;"
+               onpopuphiding="if (event.target != this)
+                                return;
+                              gContextMenu.hiding();
+                              gContextMenu = null;">
+
+
+      <menugroup id="context-navigation">
+        <menuitem id="context-back"
+                  class="menuitem-iconic"
+                  tooltiptext="&backButton.tooltip;"
+                  aria-label="&backCmd.label;"
+                  command="Browser:BackOrBackDuplicate"
+                  onclick="checkForMiddleClick(this, event);"/>
+        <menuitem id="context-forward"
+                  class="menuitem-iconic"
+                  tooltiptext="&forwardButton.tooltip;"
+                  aria-label="&forwardCmd.label;"
+                  command="Browser:ForwardOrForwardDuplicate"
+                  onclick="checkForMiddleClick(this, event);"/>
+        <menuitem id="context-reload"
+                  class="menuitem-iconic"
+                  tooltiptext="&reloadButton.tooltip;"
+                  aria-label="&reloadCmd.label;"
+                  oncommand="gContextMenu.reload(event);"
+                  onclick="checkForMiddleClick(this, event);"/>
+        <menuitem id="context-stop"
+                  class="menuitem-iconic"
+                  tooltiptext="&stopButton.tooltip;"
+                  aria-label="&stopCmd.label;"
+                  command="Browser:Stop"/>
+        <menuitem id="context-bookmarkpage"
+                  class="menuitem-iconic"
+                  observes="bookmarkThisPageBroadcaster"
+                  aria-label="&bookmarkPageCmd2.label;"
+                  oncommand="gContextMenu.bookmarkThisPage();"/>
+      </menugroup>
+      <menuseparator id="context-sep-navigation"/>
+      <menuseparator id="page-menu-separator"/>
+      <menuitem id="spell-no-suggestions"
+                disabled="true"
+                label="&spellNoSuggestions.label;"/>
+      <menuitem id="spell-add-to-dictionary"
+                label="&spellAddToDictionary.label;"
+                accesskey="&spellAddToDictionary.accesskey;"
+                oncommand="InlineSpellCheckerUI.addToDictionary();"/>
+      <menuitem id="spell-undo-add-to-dictionary"
+                label="&spellUndoAddToDictionary.label;"
+                accesskey="&spellUndoAddToDictionary.accesskey;"
+                oncommand="InlineSpellCheckerUI.undoAddToDictionary();" />
+      <menuseparator id="spell-suggestions-separator"/>
+      <menuitem id="context-openlinkincurrent"
+                label="&openLinkCmdInCurrent.label;"
+                accesskey="&openLinkCmdInCurrent.accesskey;"
+                oncommand="gContextMenu.openLinkInCurrent();"/>
+      <menuitem id="context-openlinkintab"
+                label="&openLinkCmdInTab.label;"
+                accesskey="&openLinkCmdInTab.accesskey;"
+                oncommand="gContextMenu.openLinkInTab();"/>
+      <menuitem id="context-openlink"
+                label="&openLinkCmd.label;"
+                accesskey="&openLinkCmd.accesskey;"
+                oncommand="gContextMenu.openLink();"/>
+      <menuitem id="context-openlinkprivate"
+                label="&openLinkInPrivateWindowCmd.label;"
+                accesskey="&openLinkInPrivateWindowCmd.accesskey;"
+                oncommand="gContextMenu.openLinkInPrivateWindow();"/>
+      <menuseparator id="context-sep-open"/>
+      <menuitem id="context-bookmarklink"
+                label="&bookmarkThisLinkCmd.label;"
+                accesskey="&bookmarkThisLinkCmd.accesskey;"
+                oncommand="gContextMenu.bookmarkLink();"/>
+      <menuitem id="context-sharelink"
+                label="&shareLink.label;"
+                accesskey="&shareLink.accesskey;"
+                oncommand="gContextMenu.shareLink();"/>
+      <menuitem id="context-savelink"
+                label="&saveLinkCmd.label;"
+                accesskey="&saveLinkCmd.accesskey;"
+                oncommand="gContextMenu.saveLink();"/>
+      <menuitem id="context-savelinktopocket"
+                label="&saveLinkToPocketCmd.label;"
+                accesskey="&saveLinkToPocketCmd.accesskey;"
+                oncommand="gContextMenu.saveLinkToPocket();"/>
+      <menu id="context-marklinkMenu" label="&social.marklinkMenu.label;"
+            accesskey="&social.marklinkMenu.accesskey;">
+        <menupopup/>
+      </menu>
+      <menuitem id="context-copyemail"
+                label="&copyEmailCmd.label;"
+                accesskey="&copyEmailCmd.accesskey;"
+                oncommand="gContextMenu.copyEmail();"/>
+      <menuitem id="context-copylink"
+                label="&copyLinkCmd.label;"
+                accesskey="&copyLinkCmd.accesskey;"
+                oncommand="gContextMenu.copyLink();"/>
+      <menuseparator id="context-sep-copylink"/>
+      <menuitem id="context-media-play"
+                label="&mediaPlay.label;"
+                accesskey="&mediaPlay.accesskey;"
+                oncommand="gContextMenu.mediaCommand('play');"/>
+      <menuitem id="context-media-pause"
+                label="&mediaPause.label;"
+                accesskey="&mediaPause.accesskey;"
+                oncommand="gContextMenu.mediaCommand('pause');"/>
+      <menuitem id="context-media-mute"
+                label="&mediaMute.label;"
+                accesskey="&mediaMute.accesskey;"
+                oncommand="gContextMenu.mediaCommand('mute');"/>
+      <menuitem id="context-media-unmute"
+                label="&mediaUnmute.label;"
+                accesskey="&mediaUnmute.accesskey;"
+                oncommand="gContextMenu.mediaCommand('unmute');"/>
+      <menu id="context-media-playbackrate" label="&mediaPlaybackRate.label;" accesskey="&mediaPlaybackRate.accesskey;">
+        <menupopup>
+          <menuitem id="context-media-playbackrate-050x"
+                    label="&mediaPlaybackRate050x.label;"
+                    accesskey="&mediaPlaybackRate050x.accesskey;"
+                    type="radio"
+                    name="playbackrate"
+                    oncommand="gContextMenu.mediaCommand('playbackRate', 0.5);"/>
+          <menuitem id="context-media-playbackrate-100x"
+                    label="&mediaPlaybackRate100x.label;"
+                    accesskey="&mediaPlaybackRate100x.accesskey;"
+                    type="radio"
+                    name="playbackrate"
+                    checked="true"
+                    oncommand="gContextMenu.mediaCommand('playbackRate', 1.0);"/>
+          <menuitem id="context-media-playbackrate-150x"
+                    label="&mediaPlaybackRate150x.label;"
+                    accesskey="&mediaPlaybackRate150x.accesskey;"
+                    type="radio"
+                    name="playbackrate"
+                    oncommand="gContextMenu.mediaCommand('playbackRate', 1.5);"/>
+          <menuitem id="context-media-playbackrate-200x"
+                    label="&mediaPlaybackRate200x.label;"
+                    accesskey="&mediaPlaybackRate200x.accesskey;"
+                    type="radio"
+                    name="playbackrate"
+                    oncommand="gContextMenu.mediaCommand('playbackRate', 2.0);"/>
+        </menupopup>
+      </menu>
+      <menuitem id="context-media-showcontrols"
+                label="&mediaShowControls.label;"
+                accesskey="&mediaShowControls.accesskey;"
+                oncommand="gContextMenu.mediaCommand('showcontrols');"/>
+      <menuitem id="context-media-hidecontrols"
+                label="&mediaHideControls.label;"
+                accesskey="&mediaHideControls.accesskey;"
+                oncommand="gContextMenu.mediaCommand('hidecontrols');"/>
+      <menuitem id="context-video-showstats"
+                accesskey="&videoShowStats.accesskey;"
+                label="&videoShowStats.label;"
+                oncommand="gContextMenu.mediaCommand('showstats');"/>
+      <menuitem id="context-video-hidestats"
+                accesskey="&videoHideStats.accesskey;"
+                label="&videoHideStats.label;"
+                oncommand="gContextMenu.mediaCommand('hidestats');"/>
+      <menuitem id="context-video-fullscreen"
+                accesskey="&videoFullScreen.accesskey;"
+                label="&videoFullScreen.label;"
+                oncommand="gContextMenu.mediaCommand('fullscreen');"/>
+      <menuitem id="context-leave-dom-fullscreen"
+                accesskey="&leaveDOMFullScreen.accesskey;"
+                label="&leaveDOMFullScreen.label;"
+                oncommand="gContextMenu.leaveDOMFullScreen();"/>
+      <menuseparator id="context-media-sep-commands"/>
+      <menuitem id="context-reloadimage"
+                label="&reloadImageCmd.label;"
+                accesskey="&reloadImageCmd.accesskey;"
+                oncommand="gContextMenu.reloadImage();"/>
+      <menuitem id="context-viewimage"
+                label="&viewImageCmd.label;"
+                accesskey="&viewImageCmd.accesskey;"
+                oncommand="gContextMenu.viewMedia(event);"
+                onclick="checkForMiddleClick(this, event);"/>
+      <menuitem id="context-viewvideo"
+                label="&viewVideoCmd.label;"
+                accesskey="&viewVideoCmd.accesskey;"
+                oncommand="gContextMenu.viewMedia(event);"
+                onclick="checkForMiddleClick(this, event);"/>
+      <menuitem id="context-copyimage-contents"
+                label="&copyImageContentsCmd.label;"
+                accesskey="&copyImageContentsCmd.accesskey;"
+                oncommand="goDoCommand('cmd_copyImage');"/>
+      <menuitem id="context-copyimage"
+                label="&copyImageCmd.label;"
+                accesskey="&copyImageCmd.accesskey;"
+                oncommand="gContextMenu.copyMediaLocation();"/>
+      <menuitem id="context-copyvideourl"
+                label="&copyVideoURLCmd.label;"
+                accesskey="&copyVideoURLCmd.accesskey;"
+                oncommand="gContextMenu.copyMediaLocation();"/>
+      <menuitem id="context-copyaudiourl"
+                label="&copyAudioURLCmd.label;"
+                accesskey="&copyAudioURLCmd.accesskey;"
+                oncommand="gContextMenu.copyMediaLocation();"/>
+      <menuseparator id="context-sep-copyimage"/>
+      <menuitem id="context-saveimage"
+                label="&saveImageCmd.label;"
+                accesskey="&saveImageCmd.accesskey;"
+                oncommand="gContextMenu.saveMedia();"/>
+      <menuitem id="context-shareimage"
+                label="&shareImage.label;"
+                accesskey="&shareImage.accesskey;"
+                oncommand="gContextMenu.shareImage();"/>
+      <menuitem id="context-sendimage"
+                label="&emailImageCmd.label;"
+                accesskey="&emailImageCmd.accesskey;"
+                oncommand="gContextMenu.sendMedia();"/>
+      <menuitem id="context-setDesktopBackground"
+                label="&setDesktopBackgroundCmd.label;"
+                accesskey="&setDesktopBackgroundCmd.accesskey;"
+                oncommand="gContextMenu.setDesktopBackground();"/>
+      <menuitem id="context-viewimageinfo"
+                label="&viewImageInfoCmd.label;"
+                accesskey="&viewImageInfoCmd.accesskey;"
+                oncommand="gContextMenu.viewImageInfo();"/>
+      <menuitem id="context-viewimagedesc"
+                label="&viewImageDescCmd.label;"
+                accesskey="&viewImageDescCmd.accesskey;"
+                oncommand="gContextMenu.viewImageDesc(event);"
+                onclick="checkForMiddleClick(this, event);"/>
+      <menuitem id="context-savevideo"
+                label="&saveVideoCmd.label;"
+                accesskey="&saveVideoCmd.accesskey;"
+                oncommand="gContextMenu.saveMedia();"/>
+      <menuitem id="context-sharevideo"
+                label="&shareVideo.label;"
+                accesskey="&shareVideo.accesskey;"
+                oncommand="gContextMenu.shareVideo();"/>
+      <menuitem id="context-saveaudio"
+                label="&saveAudioCmd.label;"
+                accesskey="&saveAudioCmd.accesskey;"
+                oncommand="gContextMenu.saveMedia();"/>
+      <menuitem id="context-video-saveimage"
+                accesskey="&videoSaveImage.accesskey;"
+                label="&videoSaveImage.label;"
+                oncommand="gContextMenu.saveVideoFrameAsImage();"/>
+      <menuitem id="context-sendvideo"
+                label="&emailVideoCmd.label;"
+                accesskey="&emailVideoCmd.accesskey;"
+                oncommand="gContextMenu.sendMedia();"/>
+      <menu id="context-castvideo"
+                label="&castVideoCmd.label;"
+                accesskey="&castVideoCmd.accesskey;">
+        <menupopup id="context-castvideo-popup" onpopupshowing="gContextMenu.populateCastVideoMenu(this)"/>
+      </menu>
+      <menuitem id="context-sendaudio"
+                label="&emailAudioCmd.label;"
+                accesskey="&emailAudioCmd.accesskey;"
+                oncommand="gContextMenu.sendMedia();"/>
+      <menuitem id="context-ctp-play"
+                label="&playPluginCmd.label;"
+                accesskey="&playPluginCmd.accesskey;"
+                oncommand="gContextMenu.playPlugin();"/>
+      <menuitem id="context-ctp-hide"
+                label="&hidePluginCmd.label;"
+                accesskey="&hidePluginCmd.accesskey;"
+                oncommand="gContextMenu.hidePlugin();"/>
+      <menuseparator id="context-sep-ctp"/>
+      <menuitem id="context-sharepage"
+                label="&sharePageCmd.label;"
+                accesskey="&sharePageCmd.accesskey;"
+                oncommand="SocialShare.sharePage();"/>
+      <menuitem id="context-savepage"
+                label="&savePageCmd.label;"
+                accesskey="&savePageCmd.accesskey2;"
+                oncommand="gContextMenu.savePageAs();"/>
+      <menuitem id="context-pocket"
+                label="&saveToPocketCmd.label;"
+                accesskey="&saveToPocketCmd.accesskey;"
+                oncommand="gContextMenu.savePageToPocket();"/>
+      <menu id="context-markpageMenu" label="&social.markpageMenu.label;"
+            accesskey="&social.markpageMenu.accesskey;">
+        <menupopup/>
+      </menu>
+      <menuseparator id="context-sep-viewbgimage"/>
+      <menuitem id="context-viewbgimage"
+                label="&viewBGImageCmd.label;"
+                accesskey="&viewBGImageCmd.accesskey;"
+                oncommand="gContextMenu.viewBGImage(event);"
+                onclick="checkForMiddleClick(this, event);"/>
+      <menuitem id="context-undo"
+                label="&undoCmd.label;"
+                accesskey="&undoCmd.accesskey;"
+                command="cmd_undo"/>
+      <menuseparator id="context-sep-undo"/>
+      <menuitem id="context-cut"
+                label="&cutCmd.label;"
+                accesskey="&cutCmd.accesskey;"
+                command="cmd_cut"/>
+      <menuitem id="context-copy"
+                label="&copyCmd.label;"
+                accesskey="&copyCmd.accesskey;"
+                command="cmd_copy"/>
+      <menuitem id="context-paste"
+                label="&pasteCmd.label;"
+                accesskey="&pasteCmd.accesskey;"
+                command="cmd_paste"/>
+      <menuitem id="context-delete"
+                label="&deleteCmd.label;"
+                accesskey="&deleteCmd.accesskey;"
+                command="cmd_delete"/>
+      <menuseparator id="context-sep-paste"/>
+      <menuitem id="context-selectall"
+                label="&selectAllCmd.label;"
+                accesskey="&selectAllCmd.accesskey;"
+                command="cmd_selectAll"/>
+      <menuseparator id="context-sep-selectall"/>
+      <menuitem id="context-keywordfield"
+                label="&keywordfield.label;"
+                accesskey="&keywordfield.accesskey;"
+                oncommand="AddKeywordForSearchField();"/>
+      <menuitem id="context-searchselect"
+                oncommand="BrowserSearch.loadSearchFromContext(this.searchTerms);"/>
+      <menuitem id="context-shareselect"
+                label="&shareSelect.label;"
+                accesskey="&shareSelect.accesskey;"
+                oncommand="gContextMenu.shareSelect();"/>
+      <menuseparator id="frame-sep"/>
+      <menu id="frame" label="&thisFrameMenu.label;" accesskey="&thisFrameMenu.accesskey;">
+        <menupopup>
+          <menuitem id="context-showonlythisframe"
+                    label="&showOnlyThisFrameCmd.label;"
+                    accesskey="&showOnlyThisFrameCmd.accesskey;"
+                    oncommand="gContextMenu.showOnlyThisFrame();"/>
+          <menuitem id="context-openframeintab"
+                    label="&openFrameCmdInTab.label;"
+                    accesskey="&openFrameCmdInTab.accesskey;"
+                    oncommand="gContextMenu.openFrameInTab();"/>
+          <menuitem id="context-openframe"
+                    label="&openFrameCmd.label;"
+                    accesskey="&openFrameCmd.accesskey;"
+                    oncommand="gContextMenu.openFrame();"/>
+          <menuseparator id="open-frame-sep"/>
+          <menuitem id="context-reloadframe"
+                    label="&reloadFrameCmd.label;"
+                    accesskey="&reloadFrameCmd.accesskey;"
+                    oncommand="gContextMenu.reloadFrame();"/>
+          <menuseparator/>
+          <menuitem id="context-bookmarkframe"
+                    label="&bookmarkThisFrameCmd.label;"
+                    accesskey="&bookmarkThisFrameCmd.accesskey;"
+                    oncommand="gContextMenu.addBookmarkForFrame();"/>
+          <menuitem id="context-saveframe"
+                    label="&saveFrameCmd.label;"
+                    accesskey="&saveFrameCmd.accesskey;"
+                    oncommand="gContextMenu.saveFrame();"/>
+          <menuseparator/>
+          <menuitem id="context-printframe"
+                    label="&printFrameCmd.label;"
+                    accesskey="&printFrameCmd.accesskey;"
+                    oncommand="gContextMenu.printFrame();"/>
+          <menuseparator/>
+          <menuitem id="context-viewframesource"
+                    label="&viewFrameSourceCmd.label;"
+                    accesskey="&viewFrameSourceCmd.accesskey;"
+                    oncommand="gContextMenu.viewFrameSource();"
+                    observes="isFrameImage"/>
+          <menuitem id="context-viewframeinfo"
+                    label="&viewFrameInfoCmd.label;"
+                    accesskey="&viewFrameInfoCmd.accesskey;"
+                    oncommand="gContextMenu.viewFrameInfo();"/>
+        </menupopup>
+      </menu>
+      <menuitem id="context-viewpartialsource-selection"
+                label="&viewPartialSourceForSelectionCmd.label;"
+                accesskey="&viewPartialSourceCmd.accesskey;"
+                oncommand="gContextMenu.viewPartialSource('selection');"
+                observes="isImage"/>
+      <menuitem id="context-viewpartialsource-mathml"
+                label="&viewPartialSourceForMathMLCmd.label;"
+                accesskey="&viewPartialSourceCmd.accesskey;"
+                oncommand="gContextMenu.viewPartialSource('mathml');"
+                observes="isImage"/>
+      <menuseparator id="context-sep-viewsource"/>
+      <menuitem id="context-viewsource"
+                label="&viewPageSourceCmd.label;"
+                accesskey="&viewPageSourceCmd.accesskey;"
+                oncommand="BrowserViewSource(gContextMenu.browser);"
+                observes="canViewSource"/>
+      <menuitem id="context-viewinfo"
+                label="&viewPageInfoCmd.label;"
+                accesskey="&viewPageInfoCmd.accesskey;"
+                oncommand="gContextMenu.viewInfo();"/>
+      <menuseparator id="spell-separator"/>
+      <menuitem id="spell-check-enabled"
+                label="&spellCheckToggle.label;"
+                type="checkbox"
+                accesskey="&spellCheckToggle.accesskey;"
+                oncommand="InlineSpellCheckerUI.toggleEnabled(window);"/>
+      <menuitem id="spell-add-dictionaries-main"
+                label="&spellAddDictionaries.label;"
+                accesskey="&spellAddDictionaries.accesskey;"
+                oncommand="gContextMenu.addDictionaries();"/>
+      <menu id="spell-dictionaries"
+            label="&spellDictionaries.label;"
+            accesskey="&spellDictionaries.accesskey;">
+          <menupopup id="spell-dictionaries-menu">
+              <menuseparator id="spell-language-separator"/>
+              <menuitem id="spell-add-dictionaries"
+                        label="&spellAddDictionaries.label;"
+                        accesskey="&spellAddDictionaries.accesskey;"
+                        oncommand="gContextMenu.addDictionaries();"/>
+          </menupopup>
+      </menu>
+      <menuseparator hidden="true" id="context-sep-bidi"/>
+      <menuitem hidden="true" id="context-bidi-text-direction-toggle"
+                label="&bidiSwitchTextDirectionItem.label;"
+                accesskey="&bidiSwitchTextDirectionItem.accesskey;"
+                command="cmd_switchTextDirection"/>
+      <menuitem hidden="true" id="context-bidi-page-direction-toggle"
+                label="&bidiSwitchPageDirectionItem.label;"
+                accesskey="&bidiSwitchPageDirectionItem.accesskey;"
+                oncommand="gContextMenu.switchPageDirection();"/>
+      <menuseparator id="fill-login-separator" hidden="true"/>
+      <menu id="fill-login"
+            label="&fillLoginMenu.label;"
+            label-login="&fillLoginMenu.label;"
+            label-password="&fillPasswordMenu.label;"
+            label-username="&fillUsernameMenu.label;"
+            accesskey="&fillLoginMenu.accesskey;"
+            accesskey-login="&fillLoginMenu.accesskey;"
+            accesskey-password="&fillPasswordMenu.accesskey;"
+            accesskey-username="&fillUsernameMenu.accesskey;"
+            hidden="true">
+        <menupopup id="fill-login-popup">
+          <menuitem id="fill-login-no-logins"
+                    label="&noLoginSuggestions.label;"
+                    disabled="true"
+                    hidden="true"/>
+          <menuseparator id="saved-logins-separator"/>
+          <menuitem id="fill-login-saved-passwords"
+                    label="&viewSavedLogins.label;"
+                    oncommand="gContextMenu.openPasswordManager();"/>
+        </menupopup>
+      </menu>
+      <menuseparator id="inspect-separator" hidden="true"/>
+      <menuitem id="context-inspect"
+                hidden="true"
+                label="&inspectContextMenu.label;"
+                accesskey="&inspectContextMenu.accesskey;"
+                oncommand="gContextMenu.inspectNode();"/>
+      <menuseparator id="context-media-eme-separator" hidden="true"/>
+      <menuitem id="context-media-eme-learnmore"
+                class="menuitem-iconic"
+                hidden="true"
+                label="&emeLearnMoreContextMenu.label;"
+                accesskey="&emeLearnMoreContextMenu.accesskey;"
+                oncommand="gContextMenu.drmLearnMore(event);"
+                onclick="checkForMiddleClick(this, event);"/>
+    </menupopup>
+
+
+    <panel id="notification-popup"
+           type="arrow"
+           footertype="promobox"
+           position="after_start"
+           hidden="true"
+           orient="vertical"
+           noautofocus="true"
+           role="alert"/>
+
+    <popupnotification id="webRTC-shareDevices-notification" hidden="true">
+      <popupnotificationcontent id="webRTC-selectCamera" orient="vertical">
+        <label value="&getUserMedia.selectCamera.label;"
+               accesskey="&getUserMedia.selectCamera.accesskey;"
+               control="webRTC-selectCamera-menulist"/>
+        <menulist id="webRTC-selectCamera-menulist">
+          <menupopup id="webRTC-selectCamera-menupopup"/>
+        </menulist>
+      </popupnotificationcontent>
+
+      <popupnotificationcontent id="webRTC-selectWindowOrScreen" orient="vertical">
+        <label id="webRTC-selectWindow-label"
+               control="webRTC-selectWindow-menulist"/>
+        <menulist id="webRTC-selectWindow-menulist"
+                  oncommand="gWebRTCUI.updateMainActionLabel(this);">
+          <menupopup id="webRTC-selectWindow-menupopup"/>
+        </menulist>
+        <description id="webRTC-all-windows-shared" hidden="true">&getUserMedia.allWindowsShared.message;</description>
+      </popupnotificationcontent>
+
+      <popupnotificationcontent id="webRTC-selectMicrophone" orient="vertical">
+        <label value="&getUserMedia.selectMicrophone.label;"
+               accesskey="&getUserMedia.selectMicrophone.accesskey;"
+               control="webRTC-selectMicrophone-menulist"/>
+        <menulist id="webRTC-selectMicrophone-menulist">
+          <menupopup id="webRTC-selectMicrophone-menupopup"/>
+        </menulist>
+      </popupnotificationcontent>
+    </popupnotification>
+
+    <popupnotification id="webapps-install-progress-notification" hidden="true">
+      <popupnotificationcontent id="webapps-install-progress-content" orient="vertical" align="start"/>
+    </popupnotification>
+
+    <popupnotification id="servicesInstall-notification" hidden="true">
+      <popupnotificationcontent orient="vertical" align="start">
+        <!-- XXX bug 974146, tests are looking for this, can't remove yet. -->
+      </popupnotificationcontent>
+    </popupnotification>
+
+    <popupnotification id="pointerLock-notification" hidden="true">
+      <popupnotificationcontent orient="vertical" align="start">
+        <label id="pointerLock-cancel">&pointerLock.notification.message;</label>
+      </popupnotificationcontent>
+    </popupnotification>
+
+    <popupnotification id="password-notification" hidden="true">
+      <popupnotificationcontent orient="vertical">
+        <textbox id="password-notification-username"/>
+        <textbox id="password-notification-password" type="password" show-content=""/>
+      </popupnotificationcontent>
+    </popupnotification>
+
+    <stack id="login-fill-doorhanger" hidden="true">
+      <vbox id="login-fill-mainview">
+        <description id="login-fill-testing"
+                     value="Thanks for testing the login fill doorhanger!"/>
+        <textbox id="login-fill-filter"/>
+        <richlistbox id="login-fill-list"/>
+      </vbox>
+      <vbox id="login-fill-clickcapturer"/>
+      <vbox id="login-fill-details">
+        <textbox id="login-fill-username" readonly="true"/>
+        <textbox id="login-fill-password" type="password" disabled="true"/>
+        <hbox>
+          <button id="login-fill-use" label="Use in form"/>
+        </hbox>
+      </vbox>
+    </stack>
+
+
+    <popupnotification id="addon-progress-notification" hidden="true">
+      <popupnotificationcontent orient="vertical">
+        <progressmeter id="addon-progress-notification-progressmeter"/>
+        <label id="addon-progress-notification-progresstext" crop="end"/>
+      </popupnotificationcontent>
+      <button id="addon-progress-cancel"
+              oncommand="this.parentNode.cancel();"/>
+      <button id="addon-progress-accept" disabled="true"/>
+    </popupnotification>
+
+    <popupnotification id="addon-install-confirmation-notification" hidden="true">
+      <popupnotificationcontent id="addon-install-confirmation-content" orient="vertical"/>
+      <button id="addon-install-confirmation-cancel"
+              oncommand="PopupNotifications.getNotification('addon-install-confirmation').remove();"/>
+      <button id="addon-install-confirmation-accept"
+              oncommand="gXPInstallObserver.acceptInstallation();
+                         PopupNotifications.getNotification('addon-install-confirmation').remove();"/>
+    </popupnotification>
+
+  </popupset>
+
+  <commandset id="editMenuCommands"/>
+  <chatbox id="chatter" flex="1"/>
+</window>
