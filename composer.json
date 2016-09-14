@@ -2,5 +2,8 @@
     "name": "metricso/metrifox-binary",
     "license": "MIT",
     "type": "project",
-    "description": "Modified version of Firefox (binary files only)."
+    "description": "Modified version of Firefox (binary files only).",
+    "bin": [
+        "bin/metrifox"
+    ]
 }
