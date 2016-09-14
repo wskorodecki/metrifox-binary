@@ -4,6 +4,6 @@
     "type": "project",
     "description": "Modified version of Firefox (binary files only).",
     "bin": [
-        "bin/metrifox"
+        "metrifox"
     ]
 }
