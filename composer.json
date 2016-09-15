@@ -1,9 +1,19 @@
 {
-    "name": "metricso/metrifox-binary",
-    "license": "MIT",
-    "type": "project",
-    "description": "Modified version of Firefox (binary files only).",
-    "bin": [
-        "metrifox"
-    ]
+  "name": "wskorodecki/metrifox-binary",
+  "description": "Binary version of a browser based on Mozilla technology.",
+  "license": "Prioprietary",
+  "authors": [
+    {
+      "name": "Metricso",
+      "email": "support@metricso.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "dist": {
+    "url": "git@github.com:wskorodecki/metrifox-binary.git",
+    "type": "git"
+  },
+  "bin": [
+    "metrifox"
+  ]
 }
