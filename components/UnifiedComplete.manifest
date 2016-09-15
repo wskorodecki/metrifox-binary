@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/components/places/UnifiedComplete.manifest
+component {f964a319-397a-4d21-8be6-5cdd1ee3e3ae} UnifiedComplete.js
+contract @mozilla.org/autocomplete/search;1?name=unifiedcomplete {f964a319-397a-4d21-8be6-5cdd1ee3e3ae}

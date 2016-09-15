@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/alarm/AlarmsManager.manifest
+component {fea1e884-9b05-11e1-9b64-87a7016c3860} AlarmsManager.js
+contract @mozilla.org/alarmsManager;1 {fea1e884-9b05-11e1-9b64-87a7016c3860}

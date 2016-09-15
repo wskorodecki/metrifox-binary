@@ -83,8 +83,8 @@ this.AppConstants = Object.freeze({
 //@line 110 "/home/wojtek/Repositories/firefox-45.0.2/toolkit/modules/AppConstants.jsm"
 
   MOZ_UPDATER:
-//@line 113 "/home/wojtek/Repositories/firefox-45.0.2/toolkit/modules/AppConstants.jsm"
-  true,
+//@line 115 "/home/wojtek/Repositories/firefox-45.0.2/toolkit/modules/AppConstants.jsm"
+  false,
 //@line 117 "/home/wojtek/Repositories/firefox-45.0.2/toolkit/modules/AppConstants.jsm"
 
   MOZ_SWITCHBOARD:

@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/components/privatebrowsing/PrivateBrowsing.manifest
+component {a319b616-c45d-4037-8d86-01c592b5a9af} PrivateBrowsingTrackingProtectionWhitelist.js
+contract @mozilla.org/pbm-tp-whitelist;1 {a319b616-c45d-4037-8d86-01c592b5a9af}

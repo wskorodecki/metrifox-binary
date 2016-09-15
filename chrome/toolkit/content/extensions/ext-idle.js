@@ -1,1 +1,11 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/components/extensions/ext-idle.js
+"use strict";
+
+extensions.registerPrivilegedAPI("idle", (extension, context) => {
+  return {
+    idle: {
+      queryState: function(detectionIntervalInSeconds, callback) {
+        runSafe(context, callback, "active");
+      },
+    },
+  };
+});

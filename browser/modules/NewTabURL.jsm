@@ -1,1 +1,35 @@
-/home/wojtek/Repositories/firefox-45.0.2/browser/components/newtab/NewTabURL.jsm
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+"use strict";
+
+var Cc = Components.classes;
+var Ci = Components.interfaces;
+var Cu = Components.utils;
+
+this.EXPORTED_SYMBOLS = [ "NewTabURL" ];
+
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+XPCOMUtils.defineLazyServiceGetter(this, "aboutNewTabService",
+                                   "@mozilla.org/browser/aboutnewtab-service;1",
+                                   "nsIAboutNewTabService");
+
+this.NewTabURL = {
+
+  get: function() {
+    return aboutNewTabService.newTabURL;
+  },
+
+  get overridden() {
+    return aboutNewTabService.overridden;
+  },
+
+  override: function(newURL) {
+    aboutNewTabService.newTabURL = newURL;
+  },
+
+  reset: function() {
+    aboutNewTabService.resetNewTabURL();
+  }
+};

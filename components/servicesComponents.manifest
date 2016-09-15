@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/services/common/servicesComponents.manifest
+# Register resource aliases
+resource services-common resource://gre/modules/services-common/

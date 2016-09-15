@@ -76,7 +76,6 @@ manifest components/nsPlacesAutoComplete.manifest
 manifest components/nsPrompter.manifest
 manifest components/nsURLClassifier.manifest
 manifest components/nsURLFormatter.manifest
-manifest components/nsUpdateService.manifest
 manifest components/nsUpdateTimerManager.manifest
 manifest components/nsWebHandlerApp.manifest
 manifest components/passwordmgr.manifest

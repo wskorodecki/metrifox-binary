@@ -1,1 +1,1 @@
-../../build/../.lldbinit
+script topsrcdir = "/home/wojtek/Repositories/firefox-45.0.2"; lldb.debugger.HandleCommand("command source -s true '%s'" % os.path.join(topsrcdir, ".lldbinit"))

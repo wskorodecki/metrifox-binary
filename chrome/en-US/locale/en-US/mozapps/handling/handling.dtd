@@ -1,1 +1,9 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/locales/en-US/chrome/mozapps/handling/handling.dtd
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<!ENTITY window.emWidth "26em">
+<!ENTITY window.emHeight "26em">
+<!ENTITY ChooseApp.description "Choose an Application">
+<!ENTITY ChooseApp.label "Choose…">
+<!ENTITY ChooseApp.accessKey "C">

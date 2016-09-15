@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/base/SlowScriptDebug.manifest
+component {e740ddb4-18b4-4aac-8ae1-9b0f4320769d} SlowScriptDebug.js
+contract @mozilla.org/dom/slow-script-debug;1 {e740ddb4-18b4-4aac-8ae1-9b0f4320769d}

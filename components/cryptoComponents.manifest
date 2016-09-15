@@ -1,1 +1,1 @@
-/home/wojtek/Repositories/firefox-45.0.2/services/crypto/cryptoComponents.manifest
+resource services-crypto resource://gre/modules/services-crypto/

@@ -1,1 +1,5 @@
-/home/wojtek/Repositories/firefox-45.0.2/addon-sdk/source/lib/diffpatcher/index.js
+"use strict";
+
+exports.diff = require("./diff")
+exports.patch = require("./patch")
+exports.rebase = require("./rebase")

@@ -1,1 +1,12 @@
-/home/wojtek/Repositories/firefox-45.0.2/layout/style/xbl-marquee/xbl-marquee.css
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* PRINT ONLY rules */
+@media print {
+
+  marquee > * > * { 
+    margin: 0 !important; 
+    padding: 0 !important;
+  } /* This hack is needed until bug 119078 gets fixed */
+}

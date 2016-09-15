@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/datastore/DataStore.manifest
+component {db5c9602-030f-4bff-a3de-881a8de370f2} DataStoreImpl.js
+contract @mozilla.org/dom/datastore;1 {db5c9602-030f-4bff-a3de-881a8de370f2}

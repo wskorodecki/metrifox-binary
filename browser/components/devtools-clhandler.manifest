@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/devtools/client/devtools-clhandler.manifest
+component {9e9a9283-0ce9-4e4a-8f1c-ba129a032c32} devtools-clhandler.js
+contract @mozilla.org/toolkit/console-clh;1 {9e9a9283-0ce9-4e4a-8f1c-ba129a032c32}

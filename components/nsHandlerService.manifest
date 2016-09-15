@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/uriloader/exthandler/nsHandlerService.manifest
+component {32314cc8-22f7-4f7f-a645-1a45453ba6a6} nsHandlerService.js
+contract @mozilla.org/uriloader/handler-service;1 {32314cc8-22f7-4f7f-a645-1a45453ba6a6} process=main

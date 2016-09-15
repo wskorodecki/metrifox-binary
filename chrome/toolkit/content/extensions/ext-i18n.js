@@ -1,1 +1,11 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/components/extensions/ext-i18n.js
+"use strict";
+
+extensions.registerAPI((extension, context) => {
+  return {
+    i18n: {
+      getMessage: function(messageName, substitutions) {
+        return extension.localizeMessage(messageName, substitutions);
+      },
+    },
+  };
+});

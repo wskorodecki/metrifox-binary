@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/presentation/provider/BuiltinProviders.manifest
+component {f4079b8b-ede5-4b90-a112-5b415a931deb} TCPPresentationServer.js
+contract @mozilla.org/presentation-device/tcp-presentation-server;1 {f4079b8b-ede5-4b90-a112-5b415a931deb}

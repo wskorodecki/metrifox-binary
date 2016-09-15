@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/browser-element/BrowserElementProxy.manifest
+component {7e95d54c-9930-49c8-9a10-44fe40fe8251} BrowserElementProxy.js
+contract @mozilla.org/dom/browser-element-proxy;1 {7e95d54c-9930-49c8-9a10-44fe40fe8251}

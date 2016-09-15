@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/system/SystemUpdate.manifest
+component {e8530001-ba5b-46ab-a306-7fbeb692d0fe} SystemUpdateManager.js
+contract @mozilla.org/system-update-manager;1 {e8530001-ba5b-46ab-a306-7fbeb692d0fe}

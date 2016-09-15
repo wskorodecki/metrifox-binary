@@ -1,1 +1,15 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/content/select-child.js
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+
+XPCOMUtils.defineLazyModuleGetter(this, "SelectContentHelper",
+                                  "resource://gre/modules/SelectContentHelper.jsm");
+
+addEventListener("mozshowdropdown", event => {
+  if (!event.isTrusted)
+    return;
+
+  new SelectContentHelper(event.target, this);
+});

@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/dom/inputmethod/InputMethod.manifest
+component {4607330d-e7d2-40a4-9eb8-43967eae0142} MozKeyboard.js
+contract @mozilla.org/b2g-inputmethod;1 {4607330d-e7d2-40a4-9eb8-43967eae0142}

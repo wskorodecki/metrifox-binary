@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/components/jsdownloads/src/Downloads.manifest
+component {1b4c85df-cbdd-4bb6-b04e-613caece083c} DownloadLegacy.js
+contract @mozilla.org/transfer;1 {1b4c85df-cbdd-4bb6-b04e-613caece083c}

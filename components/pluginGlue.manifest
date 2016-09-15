@@ -1,1 +1,2 @@
-/home/wojtek/Repositories/firefox-45.0.2/toolkit/pluginproblem/pluginGlue.manifest
+category agent-style-sheets pluginGlue-pluginFinder chrome://pluginproblem/content/pluginFinderBinding.css
+category agent-style-sheets pluginGlue-pluginProblem chrome://pluginproblem/content/pluginProblemBinding.css

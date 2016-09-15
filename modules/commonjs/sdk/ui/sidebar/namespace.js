@@ -1,1 +1,15 @@
-/home/wojtek/Repositories/firefox-45.0.2/addon-sdk/source/lib/sdk/ui/sidebar/namespace.js
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+'use strict';
+
+const models = exports.models = new WeakMap();
+const views = exports.views = new WeakMap();
+exports.buttons = new WeakMap();
+
+exports.viewsFor = function viewsFor(sidebar) {
+  return views.get(sidebar);
+};
+exports.modelFor = function modelFor(sidebar) {
+  return models.get(sidebar);
+};
